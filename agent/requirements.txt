@@ -1,0 +1,38 @@
+# AgentFlow Python Agent Service Dependencies
+
+# Web Framework
+flask==3.0.0
+
+# LangChain & LangGraph
+langchain==0.3.12
+langchain-core==0.3.25
+langchain-openai==0.2.12
+langchain-anthropic==0.3.0
+langgraph==0.2.60
+
+# AutoGen
+pyautogen==0.2.37
+
+# CrewAI
+crewai==0.86.0
+
+# LLM Clients
+anthropic==0.39.0
+openai==1.54.0
+zhipuai==2.1.5.20250825
+dashscope==1.20.0
+
+# HTTP Client
+requests==2.31.0
+
+# HTML Parser
+beautifulsoup4==4.12.3
+
+# YAML Parser
+pyyaml==6.0.1
+
+# Environment Variables
+python-dotenv==1.0.0
+
+# Production Server
+gunicorn==21.2.0

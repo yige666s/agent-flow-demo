@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentFlow - AI Agent 任务编排系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect width="32" height="32" rx="8" fill="url(#gradient)"/>
+                    <path d="M16 8L24 16L16 24L8 16L16 8Z" fill="white" opacity="0.9"/>
+                    <defs>
+                        <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32">
+                            <stop offset="0%" stop-color="#667eea"/>
+                            <stop offset="100%" stop-color="#764ba2"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>AgentFlow</span>
+            </div>
+            <div class="status-indicator" id="systemStatus">
+                <span class="status-dot"></span>
+                <span class="status-text">系统检查中...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section -->
+            <div class="hero">
+                <h1>AI Agent 任务编排系统</h1>
+                <p class="subtitle">通过自然语言描述任务，AgentFlow 自动拆解并执行</p>
+                <div class="features">
+                    <div class="feature-tag">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 0L10 6H16L11 10L13 16L8 12L3 16L5 10L0 6H6L8 0Z"/>
+                        </svg>
+                        多步骤执行
+                    </div>
+                    <div class="feature-tag">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <circle cx="8" cy="8" r="7" stroke="currentColor" fill="none" stroke-width="2"/>
+                            <path d="M8 3V8L11 11"/>
+                        </svg>
+                        实时监控
+                    </div>
+                    <div class="feature-tag">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" fill="none" stroke-width="2"/>
+                            <path d="M5 8L7 10L11 6" stroke="currentColor" fill="none" stroke-width="2"/>
+                        </svg>
+                        多模型支持
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Input Section -->
+            <div class="task-input-section card">
+                <h2>创建新任务</h2>
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="taskInput">任务描述</label>
+                        <textarea 
+                            id="taskInput" 
+                            class="task-textarea" 
+                            placeholder="例如：帮我获取 https://example.com 的网页标题和链接数量，并保存到 result.json 文件"
+                            rows="4"
+                            required
+                        ></textarea>
+                        <div class="input-hint">💡 提示：用自然语言描述您想要完成的任务</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M0 0L16 8L0 16V10L12 8L0 6V0Z"/>
+                        </svg>
+                        提交任务
+                    </button>
+                </form>
+
+                <!-- Example Tasks -->
+                <div class="examples">
+                    <h3>示例任务</h3>
+                    <div class="example-items">
+                        <button class="example-btn" onclick="fillExample(0)">网页分析</button>
+                        <button class="example-btn" onclick="fillExample(1)">文件操作</button>
+                        <button class="example-btn" onclick="fillExample(2)">数据提取</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks List -->
+            <div class="tasks-section">
+                <div class="tasks-header">
+                    <h2>任务列表</h2>
+                    <button class="btn btn-secondary" id="refreshBtn" onclick="refreshTasks()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 2V0L5 3L8 6V4C11.31 4 14 6.69 14 10C14 11.01 13.75 11.97 13.3 12.8L14.46 13.96C15.13 12.81 15.5 11.45 15.5 10C15.5 5.86 12.14 2.5 8 2.5V2ZM8 16C4.69 16 2 13.31 2 10C2 8.99 2.25 8.03 2.7 7.2L1.54 6.04C0.87 7.19 0.5 8.55 0.5 10C0.5 14.14 3.86 17.5 8 17.5V20L11 17L8 14V16Z"/>
+                        </svg>
+                        刷新
+                    </button>
+                </div>
+                <div id="tasksList" class="tasks-list">
+                    <div class="empty-state">
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                            <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+                            <path d="M32 20V44M20 32H44" stroke="currentColor" stroke-width="2" opacity="0.5"/>
+                        </svg>
+                        <p>暂无任务</p>
+                        <p class="hint">创建您的第一个任务开始使用</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Task Detail Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>任务详情</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

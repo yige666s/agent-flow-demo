@@ -1,0 +1,28 @@
+server:
+  host: "0.0.0.0"
+  port: 8000
+  timeout: 60  # 请求超时（秒）
+
+agent:
+  python_service_url: "http://localhost:8001"
+  request_timeout: 120  # Agent 请求超时（秒）
+  max_retries: 3
+
+worker:
+  pool_size: 10  # Worker 数量
+  queue_size: 100  # 任务队列大小
+
+storage:
+  type: "json"  # redis / json
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    password: ""
+  json:
+    data_dir: "../data"
+
+logging:
+  level: "info"  # debug / info / warn / error
+  format: "json"  # json / text
+  output: "stdout"  # stdout / file
