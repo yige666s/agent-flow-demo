@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, field
-from llm_client import get_llm_client
+from core.llm_client import get_llm_client
 from tools.base import ToolRegistry
 
 

@@ -5,7 +5,7 @@ Planner - 任务规划器
 
 from typing import Dict, Any
 from core.models import Plan, Step
-from llm_client import get_llm_client
+from core.llm_client import get_llm_client
 from tools.base import ToolRegistry
 import json
 
