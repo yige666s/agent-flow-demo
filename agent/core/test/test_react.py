@@ -6,16 +6,17 @@ ReAct Agent 测试脚本
 import os
 import sys
 
-# 添加模块路径
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+# 添加模块路径 - 指向 agent 目录
+agent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+sys.path.insert(0, agent_dir)
+os.chdir(agent_dir)
 
 from dotenv import load_dotenv
 load_dotenv()
 
 from tools import register_all_tools
-from llm_client import init_llm_client, load_config_from_file
-from react_agent import ReActAgent
+from core.llm_client import init_llm_client, load_config_from_file
+from core.react_agent import ReActAgent
 
 
 def test_react_agent():

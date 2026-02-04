@@ -24,15 +24,9 @@ RUN pip install --no-cache-dir -r requirements.txt || \
 # 复制应用代码
 COPY . .
 
-# 创建软链接以简化导入（core 模块在 /app/core 目录下）
-RUN cd /app && \
-    for module in core/models.py core/llm_client.py core/planner.py core/executor.py core/react_agent.py; do \
-        [ -f "$module" ] && ln -sf "$module" "$(basename $module)" || true; \
-    done
-
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app:/app/core
+ENV PYTHONPATH=/app
 
 # 暴露端口
 EXPOSE 8000

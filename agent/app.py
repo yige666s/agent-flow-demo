@@ -153,7 +153,7 @@ def health_check():
         })
     elif AGENT_MODE == "react":
         from tools.base import ToolRegistry
-        from llm_client import get_llm_client
+        from core.llm_client import get_llm_client
         
         llm_provider = get_llm_client()
         
@@ -168,7 +168,7 @@ def health_check():
         })
     else:
         from tools.base import ToolRegistry
-        from llm_client import get_llm_client
+        from core.llm_client import get_llm_client
         
         llm_provider = get_llm_client()
         
