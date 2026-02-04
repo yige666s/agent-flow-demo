@@ -1,0 +1,87 @@
+name: Build and Deploy Agent Flow to EKS
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: 483739914637.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REPO_AGENT: agent-flow-agent
+  ECR_REPO_BACKEND: agent-flow-backend
+  ECR_REPO_FRONTEND: agent-flow-frontend
+  EKS_CLUSTER_NAME: ferocious-rock-goose
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::483739914637:role/github_workflow_role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Agent Docker image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPO_AGENT:$IMAGE_TAG -f agent/Dockerfile ./agent
+          docker push $ECR_REGISTRY/$ECR_REPO_AGENT:$IMAGE_TAG
+          docker tag $ECR_REGISTRY/$ECR_REPO_AGENT:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO_AGENT:latest
+          docker push $ECR_REGISTRY/$ECR_REPO_AGENT:latest
+          echo "AGENT_IMAGE=$ECR_REGISTRY/$ECR_REPO_AGENT:$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Build and push Backend Docker image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPO_BACKEND:$IMAGE_TAG -f backend/Dockerfile ./backend
+          docker push $ECR_REGISTRY/$ECR_REPO_BACKEND:$IMAGE_TAG
+          docker tag $ECR_REGISTRY/$ECR_REPO_BACKEND:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO_BACKEND:latest
+          docker push $ECR_REGISTRY/$ECR_REPO_BACKEND:latest
+          echo "BACKEND_IMAGE=$ECR_REGISTRY/$ECR_REPO_BACKEND:$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Build and push Frontend Docker image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPO_FRONTEND:$IMAGE_TAG -f frontend/Dockerfile ./frontend
+          docker push $ECR_REGISTRY/$ECR_REPO_FRONTEND:$IMAGE_TAG
+          docker tag $ECR_REGISTRY/$ECR_REPO_FRONTEND:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO_FRONTEND:latest
+          docker push $ECR_REGISTRY/$ECR_REPO_FRONTEND:latest
+          echo "FRONTEND_IMAGE=$ECR_REGISTRY/$ECR_REPO_FRONTEND:$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.29.0
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region $AWS_REGION \
+            --name $EKS_CLUSTER_NAME
+
+      - name: Deploy to EKS
+        run: |
+          sed -i "s|__AGENT_IMAGE__|$AGENT_IMAGE|g" k8s/agent-deployment.yaml
+          sed -i "s|__BACKEND_IMAGE__|$BACKEND_IMAGE|g" k8s/backend-deployment.yaml
+          sed -i "s|__FRONTEND_IMAGE__|$FRONTEND_IMAGE|g" k8s/frontend-deployment.yaml
+          kubectl apply -f k8s/
+          kubectl rollout status deployment/agent-flow-agent -n default
+          kubectl rollout status deployment/agent-flow-backend -n default
+          kubectl rollout status deployment/agent-flow-frontend -n default

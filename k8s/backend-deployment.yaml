@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-flow-backend
+  labels:
+    app: agent-flow-backend
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: agent-flow-backend
+  template:
+    metadata:
+      labels:
+        app: agent-flow-backend
+    spec:
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoSchedule"
+      containers:
+        - name: backend
+          image: __BACKEND_IMAGE__
+          ports:
+            - containerPort: 8080
+          env:
+            - name: AGENT_SERVICE_URL
+              value: "http://agent-flow-agent:8000"
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: agent-flow-secrets
+                  key: ANTHROPIC_API_KEY
+                  optional: true
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: agent-flow-secrets
+                  key: OPENAI_API_KEY
+                  optional: true
+            - name: ZHIPU_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: agent-flow-secrets
+                  key: ZHIPU_API_KEY
+                  optional: true
+            - name: QWEN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: agent-flow-secrets
+                  key: QWEN_API_KEY
+                  optional: true
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5

@@ -33,6 +33,9 @@ build/
 # Environment
 .env
 
+# Kubernetes Secrets (含真实密钥)
+k8s/secrets.yaml
+
 # Data
 data/
 *.json

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-flow-backend
+  labels:
+    app: agent-flow-backend
+spec:
+  type: ClusterIP
+  selector:
+    app: agent-flow-backend
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: http
