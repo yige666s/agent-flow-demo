@@ -38,7 +38,11 @@ async function checkSystemStatus() {
 	const textEl = statusEl.querySelector('.status-text');
 
 	try {
-		const response = await fetch(`http://localhost:8000/health`);
+		// 支持本地和 Kubernetes 环境
+		const healthUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+			? 'http://localhost:8000/health'
+			: '/health';
+		const response = await fetch(healthUrl);
 		if (response.ok) {
 			const data = await response.json();
 			dotEl.classList.add('online');
@@ -113,14 +117,18 @@ async function handleSubmit(e) {
 async function loadTasks() {
 	try {
 		const response = await fetch(`${API_BASE_URL}/tasks`);
-
-		// Note: The current backend doesn't have a list endpoint
-		// So we'll maintain a local list of created tasks
-		// In production, you'd want to add a GET /tasks endpoint to the backend
-
+		if (response.ok) {
+			const data = await response.json();
+			if (data.tasks && Array.isArray(data.tasks)) {
+				tasks = data.tasks;
+			}
+		} else {
+			console.warn('Failed to fetch tasks:', response.status);
+		}
 		renderTasks();
 	} catch (error) {
 		console.error('Error loading tasks:', error);
+		renderTasks(); // 即使出错也尝试渲染本地任务
 	}
 }
 

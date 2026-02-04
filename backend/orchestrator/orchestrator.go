@@ -50,6 +50,12 @@ func (o *Orchestrator) GetTask(taskID string) (*models.Task, error) {
 	return o.storage.GetTask(taskID)
 }
 
+// ListTasks 获取任务列表（所有任务）
+func (o *Orchestrator) ListTasks() ([]*models.Task, error) {
+	// 空字符串状态 = 不过滤，0 limit = 无限制
+	return o.storage.ListTasks("", 0)
+}
+
 // CancelTask 取消任务
 func (o *Orchestrator) CancelTask(taskID string) error {
 	task, err := o.storage.GetTask(taskID)

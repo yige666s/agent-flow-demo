@@ -66,6 +66,7 @@ func main() {
 	v1 := router.Group("/api/v1")
 	{
 		v1.POST("/tasks", handler.CreateTask)
+		v1.GET("/tasks", handler.ListTasks)
 		v1.GET("/tasks/:id", handler.GetTask)
 		v1.POST("/tasks/:id/cancel", handler.CancelTask)
 	}

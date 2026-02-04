@@ -52,6 +52,25 @@ func (h *Handler) CreateTask(c *gin.Context) {
 	})
 }
 
+// ListTasks 获取任务列表
+func (h *Handler) ListTasks(c *gin.Context) {
+	tasks, err := h.orch.ListTasks()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{
+			Error: models.ErrorDetail{
+				Code:    "LIST_TASKS_FAILED",
+				Message: err.Error(),
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"tasks": tasks,
+		"count": len(tasks),
+	})
+}
+
 // GetTask 获取任务
 func (h *Handler) GetTask(c *gin.Context) {
 	taskID := c.Param("id")

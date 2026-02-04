@@ -11,7 +11,7 @@ const (
 	TaskStatusRunning   TaskStatus = "running"
 	TaskStatusCompleted TaskStatus = "completed"
 	TaskStatusFailed    TaskStatus = "failed"
-	TaskStatusCancelled TaskStatus = "c````````ancelled"
+	TaskStatusCancelled TaskStatus = "cancelled"
 )
 
 // Task 任务实体
