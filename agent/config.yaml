@@ -2,7 +2,7 @@
 
 llm:
   # 当前使用的提供商: claude / openai / zhipu / qwen
-  provider: "zhipu"
+  provider: "openai"
   
   # Claude (Anthropic) 配置
   claude:

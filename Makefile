@@ -18,7 +18,7 @@ help: ## 显示帮助信息
 # ========== 本地开发 ==========
 install-agent: ## 安装Agent依赖
 	@echo "Installing Agent dependencies..."
-	cd agent && pip install -r requirements.txt
+	cd agent && pip3 install -r requirements.txt
 
 install-backend: ## 安装Backend依赖
 	@echo "Installing Backend dependencies..."
@@ -26,7 +26,7 @@ install-backend: ## 安装Backend依赖
 
 run-agent: ## 运行Agent服务
 	@echo "Running Agent service..."
-	cd agent && python app.py
+	cd agent && python3 app.py
 
 run-backend: ## 运行Backend服务
 	@echo "Running Backend service..."
@@ -34,11 +34,11 @@ run-backend: ## 运行Backend服务
 
 run-frontend: ## 运行Frontend服务（需要http-server）
 	@echo "Running Frontend service..."
-	cd frontend && python -m http.server 8000
+	cd frontend && python3 -m http.server 8000
 
 test-agent: ## 测试Agent
 	@echo "Testing Agent..."
-	cd agent && python -m pytest core/test/
+	cd agent && python3 -m pytest core/test/
 
 test-backend: ## 测试Backend
 	@echo "Testing Backend..."
@@ -177,7 +177,7 @@ k8s-logs-frontend: k8s-config ## 查看Frontend日志
 k8s-delete-all: k8s-config ## 删除所有K8s资源
 	@echo "Deleting all Kubernetes resources..."
 	kubectl delete -f k8s/ --ignore-not-found=true || true
-	kubectl delete secret agent-flow-secrets --ignore-not-found=true || true
+# 	kubectl delete secret agent-flow-secrets --ignore-not-found=true || true
 
 # ========== 完整部署流程 ==========
 deploy-to-aws: docker-build-all docker-push-all k8s-deploy-all ## 完整部署到AWS（构建、推送、部署）

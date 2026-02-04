@@ -20,21 +20,7 @@ class ZhipuProvider(BaseLLMProvider):
         self.client = ZhipuAI(api_key=api_key)
         self.model = config.get("model", "glm-4")
     
-    @property		agent/
-		├── app.py              # 统一入口（支持 Legacy + LangGraph）
-		├── config.yaml         # 配置文件
-		├── executor.py         # Legacy 执行器
-		├── langgraph_agent.py  # LangGraph Agent
-		├── llm_client.py       # LLM 客户端
-		├── llm_providers/      # LLM 提供商
-		├── models.py           # 数据模型
-		├── planner.py          # Legacy 规划器
-		├── requirements.txt    # 依赖
-		└── tools/              # 工具模块
-		
-		data/
-		├── log/                # 任务日志（干净）
-		└── user/               # 用户文件（干净）
+    @property
     def provider_name(self) -> str:
         return "ZhipuAI"
     
