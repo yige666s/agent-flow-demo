@@ -10,8 +10,8 @@ langchain-openai==0.2.12
 langchain-anthropic==0.3.0
 langgraph==0.2.60
 
-# AutoGen
-pyautogen==0.2.37
+# AutoGen (更新为存在的版本)
+pyautogen==0.2.35
 
 # CrewAI
 crewai==0.86.0
@@ -39,3 +39,4 @@ gunicorn==21.2.0
 
 # Additional dependencies
 packaging>=21.0
+
