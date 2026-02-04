@@ -363,12 +363,6 @@ def stream_agent():
     return Response(generate(), mimetype='text/event-stream')
 
 
-@app.route('/health', methods=['GET'])
-def health_check():
-    """健康检查接口"""
-    return jsonify({"status": "healthy"}), 200
-
-
 if __name__ == '__main__':
     init_app()
     port = int(os.getenv('PORT', 8000))
