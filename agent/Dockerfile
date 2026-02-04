@@ -24,11 +24,12 @@ RUN pip install --no-cache-dir -r requirements.txt || \
 # 复制应用代码
 COPY . .
 
-# 暴露端口
-EXPOSE 8000
-
 # 设置环境变量
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+# 暴露端口
+EXPOSE 8000
 
 # 运行应用
 CMD ["python", "app.py"]

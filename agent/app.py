@@ -29,11 +29,11 @@ def init_legacy_mode():
     """初始化原有模式"""
     global planner, executor
     
-    from models import Plan
-    from planner import Planner
-    from executor import Executor
+    from core.models import Plan
+    from core.planner import Planner
+    from core.executor import Executor
     from tools import register_all_tools
-    from llm_client import init_llm_client, get_llm_client, load_config_from_file
+    from core.llm_client import init_llm_client, get_llm_client, load_config_from_file
     
     # 加载配置文件
     try:
@@ -69,9 +69,9 @@ def init_react_mode():
     """初始化 ReAct 模式"""
     global react_agent
     
-    from react_agent import ReActAgent
+    from core.react_agent import ReActAgent
     from tools import register_all_tools
-    from llm_client import init_llm_client, get_llm_client, load_config_from_file
+    from core.llm_client import init_llm_client, get_llm_client, load_config_from_file
     
     # 加载配置文件
     try:
@@ -109,7 +109,7 @@ def init_langgraph_mode():
     """初始化 LangGraph 模式"""
     global langgraph_agent
     
-    from langgraph_agent import LangGraphAgent
+    from core.agent_frame.langgraph_agent import LangGraphAgent
     
     # 读取 LLM 配置
     llm_config = {
