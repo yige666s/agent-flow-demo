@@ -137,6 +137,10 @@ k8s-update-secrets: k8s-config ## 更新Secrets并重启服务
 	kubectl rollout restart deployment/agent-flow-agent
 	kubectl rollout restart deployment/agent-flow-backend
 
+k8s-verify-secrets: k8s-config ## 验证Secrets是否已部署
+	@echo "Verifying Secrets..."
+	kubectl get secret agent-flow-secrets -o yaml
+
 k8s-deploy-agent: k8s-config ## 部署Agent到K8s
 	@echo "Deploying Agent to Kubernetes..."
 	sed "s|__AGENT_IMAGE__|$(ECR_REGISTRY)/$(ECR_REPO_AGENT):$(IMAGE_TAG)|g" k8s/agent-deployment.yaml | kubectl apply -f -

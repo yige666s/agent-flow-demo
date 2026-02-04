@@ -6,7 +6,7 @@ Executor - 任务执行器
 import re
 from datetime import datetime
 from typing import Any, Dict
-from models import Plan, ExecutionContext, StepResult
+from core.models import Plan, ExecutionContext, StepResult
 from tools.base import ToolRegistry
 import json
 

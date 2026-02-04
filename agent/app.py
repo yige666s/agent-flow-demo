@@ -229,7 +229,7 @@ def execute_plan():
         })
     
     try:
-        from models import Plan
+        from core.models import Plan
         
         data = request.get_json()
         task_id = data.get('task_id')
