@@ -1,9 +1,9 @@
 // Configuration
 // 支持本地开发和 Kubernetes 部署
-// 本地: http://localhost:8000/api/v1
+// 本地: http://localhost:8080/api/v1（后端端口）
 // Kubernetes: /api/v1 (通过 Nginx 代理)
 const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:8000/api/v1'
+    ? 'http://localhost:8080/api/v1'
     : '/api/v1';
 const POLL_INTERVAL = 2000; // 2 seconds
 
@@ -38,9 +38,11 @@ async function checkSystemStatus() {
 	const textEl = statusEl.querySelector('.status-text');
 
 	try {
-		// 支持本地和 Kubernetes 环境
+		// 统一使用 /health 路由
+		// 本地: http://localhost:8080/health（后端健康检查）
+		// Kubernetes: /health（通过 Nginx 代理）
 		const healthUrl = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-			? 'http://localhost:8000/health'
+			? 'http://localhost:8080/health'
 			: '/health';
 		const response = await fetch(healthUrl);
 		if (response.ok) {

@@ -34,6 +34,7 @@ class ToolSchema:
             "description": self.description,
             "parameters": {
                 "type": "object",
+                "instruction": "object for the tool must follow the schema",
                 "properties": {
                     param_name: {
                         "type": param.type,

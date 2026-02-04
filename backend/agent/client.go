@@ -29,13 +29,31 @@ func NewClient(baseURL string, timeout time.Duration) *Client {
 	}
 }
 
-// PlanRequest 任务拆解请求
+// RunRequest 统一执行请求（支持所有模式）
+type RunRequest struct {
+	TaskID    string                 `json:"task_id"`
+	UserInput string                 `json:"user_input"`
+	Context   map[string]interface{} `json:"context,omitempty"`
+}
+
+// RunResponse 统一执行响应
+type RunResponse struct {
+	Status      string                 `json:"status"`
+	TaskID      string                 `json:"task_id"`
+	Mode        string                 `json:"mode,omitempty"`
+	Plan        *models.Plan           `json:"plan,omitempty"`
+	Result      map[string]interface{} `json:"result"`
+	StepResults []interface{}          `json:"step_results,omitempty"`
+	Error       string                 `json:"error,omitempty"`
+}
+
+// PlanRequest 任务拆解请求（Legacy 模式）
 type PlanRequest struct {
 	TaskID    string `json:"task_id"`
 	UserInput string `json:"user_input"`
 }
 
-// PlanResponse 任务拆解响应
+// PlanResponse 任务拆解响应（Legacy 模式）
 type PlanResponse struct {
 	Status string       `json:"status"`
 	TaskID string       `json:"task_id"`
@@ -43,7 +61,7 @@ type PlanResponse struct {
 	Error  string       `json:"error,omitempty"`
 }
 
-// ExecuteRequest 任务执行请求
+// ExecuteRequest 任务执行请求（Legacy 模式）
 type ExecuteRequest struct {
 	TaskID  string                 `json:"task_id"`
 	Plan    *models.Plan           `json:"plan"`
@@ -59,7 +77,47 @@ type ExecuteResponse struct {
 	Error   string                 `json:"error,omitempty"`
 }
 
-// Plan 调用 Agent 进行任务拆解
+// Run 统一执行入口（推荐使用，支持所有 Agent 模式）
+func (c *Client) Run(taskID, userInput string, context map[string]interface{}) (*RunResponse, error) {
+	req := RunRequest{
+		TaskID:    taskID,
+		UserInput: userInput,
+		Context:   context,
+	}
+
+	body, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal request: %w", err)
+	}
+
+	resp, err := c.client.Post(
+		c.baseURL+"/agent/run",
+		"application/json",
+		bytes.NewBuffer(body),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to call agent service: %w", err)
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response: %w", err)
+	}
+
+	var runResp RunResponse
+	if err := json.Unmarshal(respBody, &runResp); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	if runResp.Status == "failed" {
+		return nil, fmt.Errorf("execution failed: %s", runResp.Error)
+	}
+
+	return &runResp, nil
+}
+
+// Plan 调用 Agent 进行任务拆解（Legacy 模式）
 func (c *Client) Plan(taskID, userInput string) (*models.Plan, error) {
 	req := PlanRequest{
 		TaskID:    taskID,

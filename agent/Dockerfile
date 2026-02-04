@@ -17,9 +17,7 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 COPY requirements.txt .
 
 # 安装Python依赖，添加更好的错误处理
-RUN pip install --no-cache-dir -r requirements.txt || \
-    (echo "First install failed, retrying with compatibility flags..." && \
-    pip install --no-cache-dir --no-build-isolation -r requirements.txt)
+RUN pip install --no-cache-dir -r requirements.txt 
 
 # 复制应用代码
 COPY . .

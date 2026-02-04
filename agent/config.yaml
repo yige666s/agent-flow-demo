@@ -2,7 +2,7 @@
 
 llm:
   # 当前使用的提供商: claude / openai / zhipu / qwen
-  provider: "openai"
+  provider: "qwen"
   
   # Claude (Anthropic) 配置
   claude:
@@ -22,14 +22,14 @@ llm:
   # 智谱 AI (GLM) 配置
   zhipu:
     api_key: "${ZHIPU_API_KEY}"
-    model: "glm-4"  # 可选: glm-4, glm-3-turbo
+    model: "glm-4.6v-flash" 
     max_tokens: 4096
     temperature: 0.7
   
   # 阿里通义千问配置
   qwen:
     api_key: "${QWEN_API_KEY}"
-    model: "qwen-max"  # 可选: qwen-max, qwen-plus, qwen-turbo
+    model: "qwen-plus"  # 可选: qwen-max, qwen-plus, qwen-turbo
     max_tokens: 4096
     temperature: 0.7
 

@@ -1,0 +1,153 @@
+version: '3.8'
+
+services:
+  # Golang API服务
+  api-gateway:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      # TODO: Configure environment variables
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=templates
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MILVUS_HOST=milvus
+      - MILVUS_PORT=19530
+      - AI_SERVICE_HOST=ai-service
+      - AI_SERVICE_PORT=50051
+    depends_on:
+      - postgres
+      - redis
+      - milvus
+      - ai-service
+    restart: always
+    networks:
+      - template-network
+
+  # Python AI服务
+  ai-service:
+    build:
+      context: .
+      dockerfile: ai_service/Dockerfile
+    ports:
+      - "50051:50051"
+    environment:
+      # TODO: Set your OpenAI API key
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=gpt-4-turbo-preview
+      - USE_LOCAL_EMBEDDING=false
+      - MILVUS_HOST=milvus
+      - MILVUS_PORT=19530
+      - GRPC_PORT=50051
+    depends_on:
+      - milvus
+    restart: always
+    networks:
+      - template-network
+
+  # PostgreSQL数据库
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      # TODO: Change default password in production
+      POSTGRES_DB: templates
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - template-network
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - template-network
+
+  # Milvus向量数据库 - Standalone模式
+  milvus:
+    image: milvusdb/milvus:v2.3.4
+    environment:
+      # TODO: Configure Milvus settings
+      ETCD_ENDPOINTS: etcd:2379
+      MINIO_ADDRESS: minio:9000
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    volumes:
+      - milvus_data:/var/lib/milvus
+    depends_on:
+      - etcd
+      - minio
+    networks:
+      - template-network
+
+  # Milvus依赖 - etcd
+  etcd:
+    image: quay.io/coreos/etcd:v3.5.5
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision
+      - ETCD_AUTO_COMPACTION_RETENTION=1000
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296
+      - ETCD_SNAPSHOT_COUNT=50000
+    volumes:
+      - etcd_data:/etcd
+    command: etcd -advertise-client-urls=http://127.0.0.1:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    networks:
+      - template-network
+
+  # Milvus依赖 - MinIO (对象存储)
+  minio:
+    image: minio/minio:latest
+    environment:
+      # TODO: Change default credentials in production
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/minio_data
+    command: minio server /minio_data --console-address ":9001"
+    networks:
+      - template-network
+
+  # RabbitMQ消息队列 (可选)
+  # rabbitmq:
+  #   image: rabbitmq:3-management-alpine
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: guest
+  #     RABBITMQ_DEFAULT_PASS: guest
+  #   volumes:
+  #     - rabbitmq_data:/var/lib/rabbitmq
+  #   networks:
+  #     - template-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  milvus_data:
+  etcd_data:
+  minio_data:
+  # rabbitmq_data:
+
+networks:
+  template-network:
+    driver: bridge

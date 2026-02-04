@@ -26,7 +26,7 @@ install-backend: ## 安装Backend依赖
 
 run-agent: ## 运行Agent服务
 	@echo "Running Agent service..."
-	cd agent && python3 app.py
+	cd agent && python3 app.py 
 
 run-backend: ## 运行Backend服务
 	@echo "Running Backend service..."
@@ -34,7 +34,7 @@ run-backend: ## 运行Backend服务
 
 run-frontend: ## 运行Frontend服务（需要http-server）
 	@echo "Running Frontend service..."
-	cd frontend && python3 -m http.server 8000
+	cd frontend && python3 -m http.server 80
 
 test-agent: ## 测试Agent
 	@echo "Testing Agent..."

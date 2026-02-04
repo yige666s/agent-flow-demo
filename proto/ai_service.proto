@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package ai_service;
+
+option go_package = "template-recommend/proto";
+
+service AIService {
+  // Understand user intent and extract features
+  rpc UnderstandIntent(IntentRequest) returns (IntentResponse);
+  
+  // Generate text embedding
+  rpc GenerateEmbedding(EmbeddingRequest) returns (EmbeddingResponse);
+  
+  // Generate recommendation explanation
+  rpc GenerateExplanation(ExplanationRequest) returns (ExplanationResponse);
+}
+
+message IntentRequest {
+  string query = 1;
+  string user_id = 2;
+  repeated string context = 3;
+}
+
+message IntentResponse {
+  string intent = 1;
+  map<string, string> features = 2;
+  repeated string keywords = 3;
+  repeated string tags = 4;
+  string search_strategy = 5;
+}
+
+message EmbeddingRequest {
+  string text = 1;
+}
+
+message EmbeddingResponse {
+  repeated float embedding = 1;
+  int32 dimension = 2;
+}
+
+message Template {
+  string template_id = 1;
+  string name = 2;
+  string description = 3;
+  repeated string tags = 4;
+}
+
+message ExplanationRequest {
+  string query = 1;
+  repeated Template templates = 2;
+}
+
+message ExplanationResponse {
+  string explanation = 1;
+  repeated string reasons = 2;
+}

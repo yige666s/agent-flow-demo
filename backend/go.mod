@@ -1,9 +1,22 @@
-module agentflow
+module template-recommend
 
 go 1.21
 
 require (
 	github.com/gin-gonic/gin v1.9.1
+	github.com/go-redis/redis/v8 v8.11.5
+	github.com/lib/pq v1.10.9
+	github.com/milvus-io/milvus-sdk-go/v2 v2.3.4
+	github.com/minio/minio-go/v7 v7.0.63
+	github.com/prometheus/client_golang v1.17.0
+	github.com/spf13/viper v1.17.0
+	github.com/streadway/amqp v1.1.0
+	go.uber.org/zap v1.26.0
+	golang.org/x/sync v0.5.0
+	google.golang.org/grpc v1.59.0
+	google.golang.org/protobuf v1.31.0
+	gorm.io/driver/postgres v1.5.4
+	gorm.io/gorm v1.25.5
 	gopkg.in/yaml.v3 v3.0.1
 )
 

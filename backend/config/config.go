@@ -75,6 +75,17 @@ func LoadConfig(path string) (*Config, error) {
 		return nil, fmt.Errorf("failed to parse config file: %w", err)
 	}
 
+	// 环境变量覆盖配置
+	if agentURL := os.Getenv("AGENT_SERVICE_URL"); agentURL != "" {
+		cfg.Agent.PythonServiceURL = agentURL
+	}
+	if redisHost := os.Getenv("REDIS_HOST"); redisHost != "" {
+		cfg.Storage.Redis.Host = redisHost
+	}
+	if storageType := os.Getenv("STORAGE_TYPE"); storageType != "" {
+		cfg.Storage.Type = storageType
+	}
+
 	return &cfg, nil
 }
 

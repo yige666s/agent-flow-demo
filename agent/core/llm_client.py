@@ -6,7 +6,7 @@ LLM 客户端封装
 import os
 import yaml
 from typing import Optional
-from llm_providers import BaseLLMProvider, LLMFactory
+from .llm_provider import BaseLLMProvider, LLMFactory
 
 
 # 全局 LLM 提供商实例
@@ -47,8 +47,6 @@ def init_llm_client(config: dict = None, provider_type: str = None, api_key: str
         _llm_provider = LLMFactory.create_provider(config)
     else:
         raise ValueError("Either config or (provider_type + api_key) must be provided")
-    
-    print(f"LLM client initialized: {_llm_provider}")
 
 
 def load_config_from_file(config_path: str = "config.yaml") -> dict:
@@ -59,7 +57,25 @@ def load_config_from_file(config_path: str = "config.yaml") -> dict:
     with open(config_path, 'r', encoding='utf-8') as f:
         config = yaml.safe_load(f)
     
-    return config.get('llm', {})
+    # 递归替换环境变量占位符
+    def replace_env_vars(obj):
+        """递归处理字典和字符串中的环境变量占位符"""
+        if isinstance(obj, dict):
+            return {k: replace_env_vars(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [replace_env_vars(item) for item in obj]
+        elif isinstance(obj, str):
+            # 处理 ${VAR_NAME} 格式的占位符
+            import re
+            def replace_match(match):
+                env_var = match.group(1)
+                return os.getenv(env_var, match.group(0))
+            return re.sub(r'\$\{([^}]+)\}', replace_match, obj)
+        else:
+            return obj
+    
+    llm_config = config.get('llm', {})
+    return replace_env_vars(llm_config)
 
 
 def _create_default_provider() -> BaseLLMProvider:

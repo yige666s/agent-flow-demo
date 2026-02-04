@@ -4,7 +4,7 @@ server:
   timeout: 60  # 请求超时（秒）
 
 agent:
-  python_service_url: "http://agent-flow-agent:8000"
+  python_service_url: "http://localhost:8000"
   request_timeout: 120  # Agent 请求超时（秒）
   max_retries: 3
 
@@ -20,7 +20,7 @@ storage:
     db: 0
     password: ""
   json:
-    data_dir: "/root/data"
+    data_dir: "./data"
 
 logging:
   level: "info"  # debug / info / warn / error

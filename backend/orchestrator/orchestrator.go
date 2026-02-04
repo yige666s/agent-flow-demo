@@ -82,43 +82,30 @@ func (o *Orchestrator) executeTask(taskID string) {
 		return
 	}
 
-	// 2. 更新状态为 PLANNING
-	if err := o.storage.UpdateTaskStatus(taskID, models.TaskStatusPlanning); err != nil {
-		log.Printf("Failed to update task status to planning: %v", err)
-		return
-	}
-
-	// 3. 调用 Agent 进行任务拆解
-	plan, err := o.agentClient.Plan(taskID, task.UserInput)
-	if err != nil {
-		log.Printf("Failed to plan task %s: %v", taskID, err)
-		o.storage.UpdateTaskError(taskID, fmt.Sprintf("Planning failed: %v", err))
-		return
-	}
-
-	// 4. 保存执行计划
-	if err := o.storage.UpdateTaskPlan(taskID, plan); err != nil {
-		log.Printf("Failed to save plan for task %s: %v", taskID, err)
-		o.storage.UpdateTaskError(taskID, fmt.Sprintf("Failed to save plan: %v", err))
-		return
-	}
-
-	// 5. 更新状态为 RUNNING
+	// 2. 更新状态为 RUNNING（使用统一端点，无需单独 planning 状态）
 	if err := o.storage.UpdateTaskStatus(taskID, models.TaskStatusRunning); err != nil {
 		log.Printf("Failed to update task status to running: %v", err)
 		return
 	}
 
-	// 6. 调用 Agent 执行任务
-	result, err := o.agentClient.Execute(taskID, plan, nil)
+	// 3. 调用 Agent 统一执行端点（自动处理 planning 和 execution）
+	runResp, err := o.agentClient.Run(taskID, task.UserInput, nil)
 	if err != nil {
-		log.Printf("Failed to execute task %s: %v", taskID, err)
+		log.Printf("Failed to run task %s: %v", taskID, err)
 		o.storage.UpdateTaskError(taskID, fmt.Sprintf("Execution failed: %v", err))
 		return
 	}
 
-	// 7. 保存结果并更新状态为 COMPLETED
-	if err := o.storage.UpdateTaskResult(taskID, result); err != nil {
+	// 4. 保存执行计划（如果有）
+	if runResp.Plan != nil {
+		if err := o.storage.UpdateTaskPlan(taskID, runResp.Plan); err != nil {
+			log.Printf("Failed to save plan for task %s: %v", taskID, err)
+			// 继续执行，不中断
+		}
+	}
+
+	// 5. 保存结果并更新状态为 COMPLETED
+	if err := o.storage.UpdateTaskResult(taskID, runResp.Result); err != nil {
 		log.Printf("Failed to save result for task %s: %v", taskID, err)
 		return
 	}
@@ -128,7 +115,7 @@ func (o *Orchestrator) executeTask(taskID string) {
 		return
 	}
 
-	log.Printf("Task %s completed successfully", taskID)
+	log.Printf("Task %s completed successfully (mode: %s)", taskID, runResp.Mode)
 }
 
 // generateTaskID 生成任务 ID
