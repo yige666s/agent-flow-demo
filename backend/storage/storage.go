@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"agentflow/models"
 )
@@ -197,4 +198,9 @@ func (s *JSONStorage) getTaskFilePath(taskID string) string {
 // GetUserFilePath 获取用户文件路径（存储用户生成的文件）
 func (s *JSONStorage) GetUserFilePath(filename string) string {
 	return filepath.Join(s.userDir, filename)
+}
+
+// getCurrentTime 获取当前时间
+func getCurrentTime() time.Time {
+	return time.Now().UTC()
 }
