@@ -19,7 +19,7 @@ crewai==0.86.0
 # LLM Clients
 anthropic==0.39.0
 openai==1.54.0
-zhipuai==2.1.5.20250825
+zhipuai==2.1.5
 dashscope==1.20.0
 
 # HTTP Client
@@ -36,3 +36,6 @@ python-dotenv==1.0.0
 
 # Production Server
 gunicorn==21.2.0
+
+# Additional dependencies
+packaging>=21.0
