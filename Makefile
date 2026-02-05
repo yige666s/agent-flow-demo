@@ -154,3 +154,28 @@ k8s-deploy-all:
 	$(MAKE) k8s-deploy-services
 	@echo "All services deployed!"
 
+k8s-delete-services:
+	@echo "Deleting services..."
+	kubectl delete -f k8s/services.yaml
+	kubectl delete -f k8s/agent-deployment.yaml
+	kubectl delete -f k8s/backend-deployment.yaml
+	kubectl delete -f k8s/frontend-deployment.yaml
+	@echo "Services deleted!"
+
+k8s-delete-infra:
+	@echo "Deleting infrastructure (Postgres, Redis, Milvus, etcd, MinIO)..."
+	kubectl delete -f k8s/infra.yaml
+	@echo "Infrastructure deleted!"
+
+k8s-delete-config:
+	@echo "Deleting config..."
+	kubectl delete -f k8s/secrets.yaml 
+	kubectl delete -f k8s/configmap.yaml
+	@echo "Config deleted!"
+
+k8s-delete-all:
+	@echo "Deleting all services..."
+	$(MAKE) k8s-delete-config
+	$(MAKE) k8s-delete-infra
+	$(MAKE) k8s-delete-services
+	@echo "All services deleted!"
