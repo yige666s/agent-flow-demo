@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 
 	"template-recommend/internal/models"
@@ -57,8 +58,8 @@ func (r *TemplateRepository) FilterByTags(ctx context.Context, tags []string, li
 	// PostgreSQL array overlap operator
 	err := r.db.WithContext(ctx).
 		Where("status = ?", "active").
-		Where("tags && ?", tags).
-		Order(gorm.Expr("cardinality(tags & ?) DESC", tags)). // Order by matching tag count
+		Where("tags && ?", pq.StringArray(tags)).
+		Order(gorm.Expr("cardinality(tags & ?) DESC", pq.StringArray(tags))). // Order by matching tag count
 		Limit(limit).
 		Find(&templates).Error
 

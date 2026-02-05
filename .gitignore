@@ -1,4 +1,4 @@
-# .gitignore for AgentFlow
+# .gitignore for Template Recommendation System
 
 # Go
 *.exe
@@ -9,6 +9,7 @@
 *.test
 *.out
 go.work
+/backend/tmp/
 
 # Python
 __pycache__/
@@ -22,12 +23,23 @@ ENV/
 *.egg-info/
 dist/
 build/
+/ai_service/proto/*_pb2.py
+/ai_service/proto/*_pb2_grpc.py
+
+# Generated proto files
+/backend/proto/
 
 # IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
+*.DS_Store
+
+# Config files with secrets
+.env
+config.local.yaml
+*.local.yaml
 *~
 
 # Environment
@@ -44,3 +56,6 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+
+# frontend
+frontend/node_modules

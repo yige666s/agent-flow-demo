@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Golang API服务
   api-gateway:
@@ -13,7 +11,7 @@ services:
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USER=postgres
-      - DB_PASSWORD=password
+      - DB_PASSWORD=postgres
       - DB_NAME=templates
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -34,7 +32,7 @@ services:
   ai-service:
     build:
       context: .
-      dockerfile: ai_service/Dockerfile
+      dockerfile: agent/Dockerfile
     ports:
       - "50051:50051"
     environment:
@@ -58,7 +56,7 @@ services:
       # TODO: Change default password in production
       POSTGRES_DB: templates
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql
@@ -85,6 +83,7 @@ services:
       # TODO: Configure Milvus settings
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
+    command: ["milvus", "run", "standalone"]
     ports:
       - "19530:19530"
       - "9091:9091"

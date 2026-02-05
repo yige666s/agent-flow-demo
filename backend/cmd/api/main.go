@@ -39,7 +39,7 @@ func main() {
 
 	// Initialize AI service client
 	// TODO: Configure AI service address from config
-	aiServiceAddr := fmt.Sprintf("%s:%d", cfg.AI.Host, cfg.AI.Port)
+	aiServiceAddr := fmt.Sprintf("%s:%d", cfg.Agent.Host, cfg.Agent.Port)
 	aiClient, err := client.NewAIServiceClient(aiServiceAddr)
 	if err != nil {
 		log.Fatalf("Failed to init AI client: %v", err)
@@ -47,7 +47,7 @@ func main() {
 	defer aiClient.Close()
 
 	// Initialize services
-	vectorSvc, err := service.NewVectorSearchService(&cfg.Milvus, templateRepo)
+	vectorSvc, err := service.NewVectorSearchService(cfg, templateRepo)
 	if err != nil {
 		log.Fatalf("Failed to init vector search service: %v", err)
 	}
@@ -66,9 +66,9 @@ func main() {
 		interactionRepo,
 	)
 
-	cacheSvc, err := service.NewCacheService(&cfg.Redis)
+	cacheSvc, err := service.NewCacheService(cfg, aiClient)
 	if err != nil {
-		log.Printf("Warning: Failed to init cache service: %v", err)
+		log.Printf("Warning: Failed to init semantic cache service: %v", err)
 	}
 	defer func() {
 		if cacheSvc != nil {
@@ -82,6 +82,21 @@ func main() {
 
 	// Setup router
 	router := gin.Default()
+
+	// CORS Middleware
+	router.Use(func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	})
 
 	// Health check
 	router.GET("/health", func(c *gin.Context) {

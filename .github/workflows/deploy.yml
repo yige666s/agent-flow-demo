@@ -81,7 +81,15 @@ jobs:
           sed -i "s|__AGENT_IMAGE__|$AGENT_IMAGE|g" k8s/agent-deployment.yaml
           sed -i "s|__BACKEND_IMAGE__|$BACKEND_IMAGE|g" k8s/backend-deployment.yaml
           sed -i "s|__FRONTEND_IMAGE__|$FRONTEND_IMAGE|g" k8s/frontend-deployment.yaml
-          kubectl apply -f k8s/
-          kubectl rollout status deployment/agent-flow-agent -n default
-          kubectl rollout status deployment/agent-flow-backend -n default
+          # Apply config first
+          # kubectl apply -f k8s/secrets.yaml
+          # kubectl apply -f k8s/configmap.yaml
+          # Then services and deployments
+          kubectl apply -f k8s/services.yaml
+          kubectl apply -f k8s/agent-deployment.yaml
+          kubectl apply -f k8s/backend-deployment.yaml
+          kubectl apply -f k8s/frontend-deployment.yaml
+          
+          kubectl rollout status deployment/agent-deployment -n default
+          kubectl rollout status deployment/backend-deployment -n default
           kubectl rollout status deployment/agent-flow-frontend -n default

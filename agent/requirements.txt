@@ -1,41 +1,35 @@
-# AgentFlow Python Agent Service Dependencies
+# Web
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
 
-# Web Framework
-flask>=3.0.0
+# LangChain new stack
+langchain==0.3.27
+langchain-core==0.3.78
+langchain-community==0.3.27
+langchain-openai>=0.2.0
+langchain-anthropic==0.3.22
 
-# LangChain & LangGraph (使用灵活的版本约束)
-langchain>=0.1.0
-langchain-core>=0.1.0
-langchain-openai>=0.1.0
-langchain-anthropic>=0.1.0
-langgraph>=0.1.0
+# LangGraph new stack
+langgraph==0.2.39
+langgraph-checkpoint==2.1.2
+langgraph-prebuilt==0.6.5
 
-# AutoGen
-pyautogen>=0.2.0
+# LLM SDKs
+openai>=1.10.0,<2.0.0
+anthropic>=0.25.0
 
-# LLM Clients
-anthropic>=0.1.0
-openai>=1.55.3
-zhipuai>=2.1.0
-dashscope>=1.0.0
+# Data / infra
+pymilvus==2.6.8
+grpcio==1.76.0
+redis==5.0.1
 
-# HTTP Client
-requests>=2.28.0
+# Core deps
+pydantic>=2.7.4,<3.0.0
+numpy==1.26.2
+pyyaml==6.0.1
+prometheus-client==0.19.0
 
-# HTML Parser
-beautifulsoup4>=4.11.0
-
-# YAML Parser
-pyyaml>=6.0
-
-# Environment Variables
-python-dotenv>=1.0.0
-
-# Production Server
-gunicorn>=21.0.0
-
-# Additional dependencies
-packaging>=21.0
-
-
-
+# Embeddings
+sentence-transformers>=3.0.0
+torch==2.2.2
+transformers>=4.36.0

@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agent-flow-config
+data:
+  # LLM Settings
+  LLM_PROVIDER: "qwen"
+  LLM_MODEL: "qwen-plus"
+  
+  # Embedding Settings
+  EMBEDDING_PROVIDER: "qwen"
+  EMBEDDING_MODEL: "text-embedding-v3"
+  USE_LOCAL_EMBEDDING: "false"
+  
+  # Infrastructure Hosts
+  MILVUS_HOST: "milvus-service"
+  MILVUS_PORT: "19530"
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "templates"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  
+  # Agent Service
+  AGENT_SERVICE_HOST: "agent-service"
+  AGENT_SERVICE_PORT: "50051"
+  EMBEDDING_DIM: "1024"

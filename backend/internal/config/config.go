@@ -11,7 +11,7 @@ type Config struct {
 	Database DatabaseConfig
 	Redis    RedisConfig
 	Milvus   MilvusConfig
-	AI       AIServiceConfig
+	Agent    AIServiceConfig `mapstructure:"agent"`
 	RabbitMQ RabbitMQConfig
 	MinIO    MinIOConfig
 }
@@ -45,8 +45,9 @@ type MilvusConfig struct {
 }
 
 type AIServiceConfig struct {
-	Host string
-	Port int
+	Host         string
+	Port         int
+	EmbeddingDim int `mapstructure:"embedding_dim"`
 }
 
 type RabbitMQConfig struct {
@@ -96,7 +97,7 @@ func setDefaults() {
 	viper.SetDefault("database.host", "localhost")
 	viper.SetDefault("database.port", 5432)
 	viper.SetDefault("database.user", "postgres")
-	viper.SetDefault("database.password", "password")
+	viper.SetDefault("database.password", "postgres")
 	viper.SetDefault("database.dbname", "templates")
 	viper.SetDefault("database.sslmode", "disable")
 
@@ -110,9 +111,10 @@ func setDefaults() {
 	viper.SetDefault("milvus.host", "localhost")
 	viper.SetDefault("milvus.port", 19530)
 
-	// TODO: AI Service defaults - configure based on your environment
-	viper.SetDefault("ai.host", "localhost")
-	viper.SetDefault("ai.port", 50051)
+	// AI Service (Agent) defaults
+	viper.SetDefault("agent.host", "localhost")
+	viper.SetDefault("agent.port", 50051)
+	viper.SetDefault("agent.embedding_dim", 1536)
 
 	// TODO: RabbitMQ defaults - configure based on your environment
 	viper.SetDefault("rabbitmq.host", "localhost")

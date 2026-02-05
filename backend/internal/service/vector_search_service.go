@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/milvus-io/milvus-sdk-go/v2/client"
 	"github.com/milvus-io/milvus-sdk-go/v2/entity"
@@ -19,11 +20,11 @@ type VectorSearchService struct {
 	dimension      int
 }
 
-func NewVectorSearchService(cfg *config.MilvusConfig, templateRepo *repository.TemplateRepository) (*VectorSearchService, error) {
+func NewVectorSearchService(cfg *config.Config, templateRepo *repository.TemplateRepository) (*VectorSearchService, error) {
 	// TODO: Configure Milvus connection parameters
 	milvusClient, err := client.NewGrpcClient(
 		context.Background(),
-		fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+		fmt.Sprintf("%s:%d", cfg.Milvus.Host, cfg.Milvus.Port),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to Milvus: %w", err)
@@ -33,7 +34,7 @@ func NewVectorSearchService(cfg *config.MilvusConfig, templateRepo *repository.T
 		milvusClient:   milvusClient,
 		templateRepo:   templateRepo,
 		collectionName: "templates",
-		dimension:      1536, // TODO: Configure embedding dimension based on model
+		dimension:      cfg.Agent.EmbeddingDim,
 	}
 
 	// Initialize collection if not exists
@@ -42,6 +43,10 @@ func NewVectorSearchService(cfg *config.MilvusConfig, templateRepo *repository.T
 	}
 
 	return svc, nil
+}
+
+func (s *VectorSearchService) DropCollection(ctx context.Context) error {
+	return s.milvusClient.DropCollection(ctx, s.collectionName)
 }
 
 func (s *VectorSearchService) initCollection(ctx context.Context) error {
@@ -163,6 +168,8 @@ func (s *VectorSearchService) Search(ctx context.Context, embedding []float32, t
 	for i := range templates {
 		templates[i].VectorScore = scoreMap[templates[i].TemplateID]
 	}
+
+	log.Printf("Found %d similar templates", len(templates))
 
 	return templates, nil
 }

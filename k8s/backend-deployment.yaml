@@ -1,76 +1,61 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: agent-flow-backend
+  name: backend-deployment
   labels:
-    app: agent-flow-backend
+    app: backend-service
 spec:
   replicas: 1
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
   selector:
     matchLabels:
-      app: agent-flow-backend
+      app: backend-service
   template:
     metadata:
       labels:
-        app: agent-flow-backend
+        app: backend-service
     spec:
-      tolerations:
-      - key: "CriticalAddonsOnly"
-        operator: "Exists"
-        effect: "NoSchedule"
       containers:
-        - name: backend
-          image: __BACKEND_IMAGE__
-          ports:
-            - containerPort: 8080
-          env:
-            - name: AGENT_SERVICE_URL
-              value: "http://agent-flow-agent:8000"
-            - name: ANTHROPIC_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: agent-flow-secrets
-                  key: ANTHROPIC_API_KEY
-                  optional: true
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: agent-flow-secrets
-                  key: OPENAI_API_KEY
-                  optional: true
-            - name: ZHIPU_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: agent-flow-secrets
-                  key: ZHIPU_API_KEY
-                  optional: true
-            - name: QWEN_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: agent-flow-secrets
-                  key: QWEN_API_KEY
-                  optional: true
-          resources:
-            requests:
-              cpu: "500m"
-              memory: "512Mi"
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8080
-            initialDelaySeconds: 10
-            periodSeconds: 5
+      - name: backend
+        image: __BACKEND_IMAGE__ # CI 替换占位符
+        ports:
+        - containerPort: 8080
+        env:
+        # DB Config
+        - name: DB_HOST
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: DB_HOST } }
+        - name: DB_PORT
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: DB_PORT } }
+        - name: DB_NAME
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: DB_NAME } }
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_PASSWORD
+          valueFrom: { secretKeyRef: { name: agent-flow-secrets, key: DB_PASSWORD } }
+        
+        # Redis Config
+        - name: REDIS_HOST
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: REDIS_HOST } }
+        - name: REDIS_PORT
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: REDIS_PORT } }
+        
+        # Milvus Config
+        - name: MILVUS_HOST
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: MILVUS_HOST } }
+        - name: MILVUS_PORT
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: MILVUS_PORT } }
+          
+        # Agent Service Config
+        - name: AGENT_HOST
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: AGENT_SERVICE_HOST } }
+        - name: AGENT_PORT
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: AGENT_SERVICE_PORT } }
+        - name: EMBEDDING_DIM
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: EMBEDDING_DIM } }
+        
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+          requests:
+            cpu: "200m"
+            memory: "512Mi"

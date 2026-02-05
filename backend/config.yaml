@@ -7,6 +7,7 @@ agent:
   python_service_url: "http://localhost:8000"
   request_timeout: 120  # Agent 请求超时（秒）
   max_retries: 3
+  embedding_dim: 1024 # 1536 for OpenAI, 1024 for Zhipu
 
 worker:
   pool_size: 10  # Worker 数量

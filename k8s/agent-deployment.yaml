@@ -1,76 +1,51 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: agent-flow-agent
+  name: agent-deployment
   labels:
-    app: agent-flow-agent
+    app: agent-service
 spec:
   replicas: 1
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
   selector:
     matchLabels:
-      app: agent-flow-agent
+      app: agent-service
   template:
     metadata:
       labels:
-        app: agent-flow-agent
+        app: agent-service
     spec:
-      tolerations:
-      - key: "CriticalAddonsOnly"
-        operator: "Exists"
-        effect: "NoSchedule"
       containers:
-        - name: agent
-          image: __AGENT_IMAGE__
-          ports:
-            - containerPort: 8000
-          env:
-            - name: PYTHONUNBUFFERED
-              value: "1"
-            - name: ANTHROPIC_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: agent-flow-secrets
-                  key: ANTHROPIC_API_KEY
-                  optional: true
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: agent-flow-secrets
-                  key: OPENAI_API_KEY
-                  optional: true
-            - name: ZHIPU_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: agent-flow-secrets
-                  key: ZHIPU_API_KEY
-                  optional: true
-            - name: QWEN_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: agent-flow-secrets
-                  key: QWEN_API_KEY
-                  optional: true
-          resources:
-            requests:
-              cpu: "500m"
-              memory: "512Mi"
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 30
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 10
-            periodSeconds: 5
+      - name: agent
+        image: __AGENT_IMAGE__ # CI 替换占位符
+        ports:
+        - containerPort: 50051
+        env:
+        # From ConfigMap
+        - name: LLM_PROVIDER
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: LLM_PROVIDER } }
+        - name: LLM_MODEL
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: LLM_MODEL } }
+        - name: EMBEDDING_PROVIDER
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: EMBEDDING_PROVIDER } }
+        - name: EMBEDDING_MODEL
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: EMBEDDING_MODEL } }
+        - name: MILVUS_HOST
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: MILVUS_HOST } }
+        - name: MILVUS_PORT
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: MILVUS_PORT } }
+        - name: GRPC_PORT
+          valueFrom: { configMapKeyRef: { name: agent-flow-config, key: AGENT_SERVICE_PORT } }
+        # From Secret
+        - name: LLM_API_KEY
+          valueFrom: { secretKeyRef: { name: agent-flow-secrets, key: LLM_API_KEY } }
+        - name: EMBEDDING_API_KEY
+          valueFrom: { secretKeyRef: { name: agent-flow-secrets, key: EMBEDDING_API_KEY } }
+        - name: ZHIPU_API_KEY
+          valueFrom: { secretKeyRef: { name: agent-flow-secrets, key: ZHIPU_API_KEY } }
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+          requests:
+            cpu: "0.5"
+            memory: "1Gi"

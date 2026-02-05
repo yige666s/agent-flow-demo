@@ -1,37 +1,30 @@
-# 使用官方Golang镜像作为构建阶段
+# Golang API服务 Dockerfile
 FROM golang:1.21-alpine AS builder
 
-# 设置工作目录
 WORKDIR /app
 
-# 复制go mod文件
-COPY go.mod go.sum* ./
-
-# 下载依赖
+# 安装依赖
+COPY go.mod go.sum ./
 RUN go mod download
 
 # 复制源代码
 COPY . .
 
-# 构建应用
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+# 编译
+RUN CGO_ENABLED=0 GOOS=linux go build -o /api-server ./cmd/api
 
-# 使用轻量级alpine镜像作为运行阶段
+# 运行镜像
 FROM alpine:latest
 
-# 安装ca证书（用于HTTPS请求）
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates tzdata
 
 WORKDIR /root/
 
-# 从构建阶段复制二进制文件
-COPY --from=builder /app/main .
+COPY --from=builder /api-server .
 
-# 复制配置文件
-COPY config.yaml .
+# TODO: Copy config file if needed
+# COPY config.yaml .
 
-# 暴露端口
 EXPOSE 8080
 
-# 运行应用
-CMD ["./main"]
+CMD ["./api-server"]

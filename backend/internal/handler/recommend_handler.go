@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -52,10 +53,15 @@ func (h *RecommendHandler) Recommend(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	// 1. Check cache
-	cached, err := h.cacheSvc.GetRecommendation(ctx, req.Query)
-	if err == nil && cached != nil {
-		c.JSON(http.StatusOK, cached)
-		return
+	if h.cacheSvc != nil {
+		cached, err := h.cacheSvc.GetRecommendation(ctx, req.Query)
+		if err != nil {
+			log.Printf("[Cache] Error getting recommendation from cache: %v", err)
+		}
+		if cached != nil {
+			c.JSON(http.StatusOK, cached)
+			return
+		}
 	}
 
 	// 2. Call recommendation service
@@ -75,7 +81,9 @@ func (h *RecommendHandler) Recommend(c *gin.Context) {
 	}
 
 	// 4. Cache result asynchronously
-	go h.cacheSvc.CacheRecommendation(c.Copy(), req.Query, response)
+	if h.cacheSvc != nil {
+		go h.cacheSvc.CacheRecommendation(c.Copy(), req.Query, response)
+	}
 
 	c.JSON(http.StatusOK, response)
 }
