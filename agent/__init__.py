@@ -1,1 +1,3 @@
-# Empty __init__.py to make this a package
+from .agent import TemplateAgent
+from .config import config
+from .embedding import EmbeddingService

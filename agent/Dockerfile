@@ -18,7 +18,7 @@ RUN touch proto/__init__.py && python -m grpc_tools.protoc \
     --grpc_python_out=. \
     proto/agent.proto
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/app:/app/agent
 
 EXPOSE 50051
 
