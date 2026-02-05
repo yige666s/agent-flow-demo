@@ -1,9 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: agent-flow-frontend
+  name: frontend-deployment
   labels:
-    app: agent-flow-frontend
+    app: frontend-service
 spec:
   replicas: 1
   strategy:
@@ -13,11 +13,11 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app: agent-flow-frontend
+      app: frontend-service
   template:
     metadata:
       labels:
-        app: agent-flow-frontend
+        app: frontend-service
     spec:
       tolerations:
       - key: "CriticalAddonsOnly"

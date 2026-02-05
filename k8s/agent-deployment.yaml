@@ -14,6 +14,10 @@ spec:
       labels:
         app: agent-service
     spec:
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoSchedule"
       containers:
       - name: agent
         image: __AGENT_IMAGE__ # CI 替换占位符

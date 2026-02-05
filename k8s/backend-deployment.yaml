@@ -14,6 +14,10 @@ spec:
       labels:
         app: backend-service
     spec:
+      tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoSchedule"
       containers:
       - name: backend
         image: __BACKEND_IMAGE__ # CI 替换占位符
