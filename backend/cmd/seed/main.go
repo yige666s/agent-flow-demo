@@ -95,7 +95,16 @@ func main() {
 
 	ctx := context.Background()
 	for _, tmpl := range templates {
-		text := fmt.Sprintf("%s %s %s", tmpl.Name, tmpl.Description, tmpl.Category)
+		// Enhanced text with more metadata for better semantic matching
+		text := fmt.Sprintf("%s。%s。分类：%s。风格：%s。色调：%s。用途：%s。标签：%s",
+			tmpl.Name,
+			tmpl.Description,
+			tmpl.Category,
+			tmpl.Style,
+			tmpl.ColorScheme,
+			tmpl.UseCase,
+			joinTags(tmpl.Tags),
+		)
 
 		log.Printf("Generating embedding for [%s]...", tmpl.Name)
 		embedding, err := aiClient.GenerateEmbedding(ctx, text)
@@ -123,4 +132,18 @@ func main() {
 	} else {
 		log.Println("No templates successfully processed.")
 	}
+}
+
+func joinTags(tags []string) string {
+	if len(tags) == 0 {
+		return ""
+	}
+	result := ""
+	for i, tag := range tags {
+		if i > 0 {
+			result += "、"
+		}
+		result += tag
+	}
+	return result
 }

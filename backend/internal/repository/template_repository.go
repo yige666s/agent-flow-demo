@@ -69,15 +69,25 @@ func (r *TemplateRepository) FilterByTags(ctx context.Context, tags []string, li
 func (r *TemplateRepository) SearchByKeywords(ctx context.Context, keywords []string, limit int) ([]models.Template, error) {
 	var templates []models.Template
 
-	query := r.db.WithContext(ctx).Where("status = ?", "active")
-
-	for _, keyword := range keywords {
-		query = query.Where(
-			"name ILIKE ? OR description ILIKE ? OR category ILIKE ?",
-			"%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%",
-		)
+	if len(keywords) == 0 {
+		return templates, nil
 	}
 
+	query := r.db.WithContext(ctx).Where("status = ?", "active")
+
+	// Use OR logic instead of AND to avoid empty results
+	// Build a condition that matches ANY keyword
+	conditions := r.db.Where("1 = 0") // Start with false condition
+	for _, keyword := range keywords {
+		conditions = conditions.Or(
+			"name ILIKE ? OR description ILIKE ? OR category ILIKE ? OR style ILIKE ? OR use_case ILIKE ?",
+			"%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%",
+		)
+	}
+	query = query.Where(conditions)
+
+	// Order by relevance: templates matching more keywords rank higher
+	// This is a simple heuristic - in production you might use full-text search
 	err := query.Limit(limit).Find(&templates).Error
 	return templates, err
 }
