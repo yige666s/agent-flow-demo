@@ -92,4 +92,4 @@ jobs:
           
           kubectl rollout status deployment/agent-deployment -n default
           kubectl rollout status deployment/backend-deployment -n default
-          kubectl rollout status deployment/agent-flow-frontend -n default
+          kubectl rollout status deployment/frontend-deployment -n default
