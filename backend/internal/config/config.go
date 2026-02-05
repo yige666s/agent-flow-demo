@@ -137,4 +137,22 @@ func setDefaults() {
 	viper.SetDefault("minio.secretKey", "minioadmin")
 	viper.SetDefault("minio.useSSL", false)
 	viper.SetDefault("minio.bucket", "templates")
+
+	// Bind environment variables explicitly to match k8s/backend-deployment.yaml
+	viper.BindEnv("database.host", "DB_HOST")
+	viper.BindEnv("database.port", "DB_PORT")
+	viper.BindEnv("database.user", "DB_USER")
+	viper.BindEnv("database.password", "DB_PASSWORD")
+	viper.BindEnv("database.dbname", "DB_NAME")
+
+	viper.BindEnv("redis.host", "REDIS_HOST")
+	viper.BindEnv("redis.port", "REDIS_PORT")
+	viper.BindEnv("redis.password", "REDIS_PASSWORD")
+
+	viper.BindEnv("milvus.host", "MILVUS_HOST")
+	viper.BindEnv("milvus.port", "MILVUS_PORT")
+
+	viper.BindEnv("agent.host", "AGENT_HOST")
+	viper.BindEnv("agent.port", "AGENT_PORT")
+	viper.BindEnv("agent.embedding_dim", "EMBEDDING_DIM")
 }
