@@ -11,12 +11,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY agent/ ./agent/
 COPY proto/ ./proto/
 
-# 生成gRPC代码
-RUN mkdir -p agent/proto && python -m grpc_tools.protoc \
-    -I./proto \
-    --python_out=./agent/proto \
-    --grpc_python_out=./agent/proto \
-    ./proto/agent.proto
+# 生成gRPC代码 (并在proto目录创建__init__.py使其成为Python包)
+RUN touch proto/__init__.py && python -m grpc_tools.protoc \
+    -I. \
+    --python_out=. \
+    --grpc_python_out=. \
+    proto/agent.proto
 
 ENV PYTHONPATH=/app
 
