@@ -39,7 +39,7 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPO_AGENT:$IMAGE_TAG -f agent/Dockerfile ./agent
+          docker build -t $ECR_REGISTRY/$ECR_REPO_AGENT:$IMAGE_TAG -f agent/Dockerfile .
           docker push $ECR_REGISTRY/$ECR_REPO_AGENT:$IMAGE_TAG
           docker tag $ECR_REGISTRY/$ECR_REPO_AGENT:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO_AGENT:latest
           docker push $ECR_REGISTRY/$ECR_REPO_AGENT:latest
@@ -49,7 +49,7 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPO_BACKEND:$IMAGE_TAG -f backend/Dockerfile ./backend
+          docker build -t $ECR_REGISTRY/$ECR_REPO_BACKEND:$IMAGE_TAG -f backend/Dockerfile .
           docker push $ECR_REGISTRY/$ECR_REPO_BACKEND:$IMAGE_TAG
           docker tag $ECR_REGISTRY/$ECR_REPO_BACKEND:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO_BACKEND:latest
           docker push $ECR_REGISTRY/$ECR_REPO_BACKEND:latest
@@ -59,7 +59,7 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPO_FRONTEND:$IMAGE_TAG -f frontend/Dockerfile ./frontend
+          docker build -t $ECR_REGISTRY/$ECR_REPO_FRONTEND:$IMAGE_TAG -f frontend/Dockerfile .
           docker push $ECR_REGISTRY/$ECR_REPO_FRONTEND:$IMAGE_TAG
           docker tag $ECR_REGISTRY/$ECR_REPO_FRONTEND:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO_FRONTEND:latest
           docker push $ECR_REGISTRY/$ECR_REPO_FRONTEND:latest

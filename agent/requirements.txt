@@ -21,6 +21,7 @@ anthropic>=0.25.0
 # Data / infra
 pymilvus==2.6.8
 grpcio==1.76.0
+grpcio-tools==1.76.0
 redis==5.0.1
 
 # Core deps

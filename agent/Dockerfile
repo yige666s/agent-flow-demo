@@ -12,15 +12,13 @@ COPY agent/ ./agent/
 COPY proto/ ./proto/
 
 # 生成gRPC代码
-RUN python -m grpc_tools.protoc \
+RUN mkdir -p agent/proto && python -m grpc_tools.protoc \
     -I./proto \
     --python_out=./agent/proto \
     --grpc_python_out=./agent/proto \
     ./proto/agent.proto
 
-# TODO: Set environment variables
 ENV PYTHONPATH=/app
-ENV OPENAI_API_KEY=""
 
 EXPOSE 50051
 
